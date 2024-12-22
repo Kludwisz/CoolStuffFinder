@@ -16,15 +16,15 @@ import com.seedfinding.mcfeature.loot.item.Items;
 import com.seedfinding.mcfeature.structure.BastionRemnant;
 import com.seedfinding.mcseed.lcg.LCG;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class ObbyFinder {
-    private static final String SEEDLIST_FILENAME = Paths.get("src/main/resources/bastionObby.txt").toAbsolutePath().toString();
+    private final InputStream SEEDLIST_INPUT_STREAM = Objects.requireNonNull(ObbyFinder.class.getClassLoader().getResourceAsStream("bastionObby.txt"));
 
     private final long worldseed;
     private int obbyCount = 0;
@@ -35,11 +35,10 @@ public class ObbyFinder {
 
     public String getFeatureTPCommand() {
         // load seedlist into memory
-        try {
+        try (Scanner fin = new Scanner(SEEDLIST_INPUT_STREAM)) {
             ArrayList<Long> popseeds = new ArrayList<>();
-
             ChunkRand rand = new ChunkRand();
-            Scanner fin = new Scanner(new File(SEEDLIST_FILENAME));
+
             while (fin.hasNextLong()) {
                 long internalSeed = fin.nextLong();
                 rand.setSeed(internalSeed, false);
@@ -93,9 +92,6 @@ public class ObbyFinder {
                     }
                 }
             }
-        }
-        catch (IOException e) {
-            System.err.println("Error reading seedlist file: " + e.getMessage());
         }
 
         return null;

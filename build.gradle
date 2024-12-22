@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'application'
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -11,10 +10,6 @@ repositories {
     mavenCentral()
     maven { url "https://maven.seedfinding.com" }
     maven { url "https://jitpack.io" }
-}
-
-application {
-    mainClass = 'com.kludwisz.featurefinder.UserInterface'
 }
 
 dependencies {
@@ -32,4 +27,10 @@ dependencies {
     implementation('com.seedfinding:mc_feature:1.171.9') { transitive = false }
 
     implementation('com.github.Kludwisz:BastionGenerator:f2bddf8769') {transitive = false}
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'com.kludwisz.featurefinder.UserInterface', 'Version': '1.0'
+    }
 }
