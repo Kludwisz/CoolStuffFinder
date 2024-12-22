@@ -3,7 +3,7 @@ A java GUI application that quickly finds the coordinates of a Bastion double ch
 
 # How to run
 ## Windows:
-- Download the executable jar
+- Download the executable jar (batch script is optional)
 - Either run the batch script or do `java -jar CoolStuffFinder-1.0-all.jar` (adjust file name if needed)
   
 ## Linux / MacOS:
