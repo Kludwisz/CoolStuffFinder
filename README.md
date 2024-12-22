@@ -8,4 +8,4 @@ A java GUI application that quickly finds the coordinates of a Bastion double ch
   
 ## Linux / MacOS:
 - Download the executable jar
-- Run `java -jar CoolStuffFinder-1.0-all.jar`
+- Run `java -jar CoolStuffFinder-1.0-all.jar` (adjust file name if needed)
