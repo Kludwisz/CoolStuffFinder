@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.LongStream;
 
+/*
+Implementation of a silly algorithm that solves a user-defined family of two-variable congruences
+constrained by Minecraft's world size. Returns a set of chunk coordinates for a given world seed
+that get seeded with one of the user-specified population seeds.
+ */
 public class PopulationSeedChunkFinder {
     private static final int NUM_STEPS = 2048;
     private static final long MAX_COORDINATE = 1874999L;
