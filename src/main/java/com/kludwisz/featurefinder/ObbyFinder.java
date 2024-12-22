@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ObbyFinder {
-    private static final String SEEDLIST_FILENAME = Paths.get("src/main/resources/seedlists/bastionObby.txt").toAbsolutePath().toString();
+    private static final String SEEDLIST_FILENAME = Paths.get("src/main/resources/bastionObby.txt").toAbsolutePath().toString();
 
     private final long worldseed;
     private int obbyCount = 0;
@@ -102,6 +102,6 @@ public class ObbyFinder {
     }
 
     public String getFeedbackMessage() {
-        return "Done! (" + obbyCount  + ")";
+        return "Found double chest with " + obbyCount  + " obsidian.";
     }
 }

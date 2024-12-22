@@ -2,53 +2,70 @@ package com.kludwisz.featurefinder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+
+import static java.awt.GridBagConstraints.RELATIVE;
 
 public class UserInterface {
     private static final String TEXT_ACTIVE = "Find Cool Stuff";
     private static final String TEXT_WORKING = "Working...";
 
+    private static final JTextField seedInput = new JTextField(20);
+    private static final JLabel outputInfoLabel = new JLabel("-");
+    private static final JLabel tpCommandLabel = new JLabel("-");
+    private static final JButton copyTpButton = new JButton("Copy TP Command");
+
     public static void main(String[] args) {
-        // Create a new JFrame
         JFrame frame = new JFrame("Feature Finder by Kris");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 300);
 
-        // Create a panel to hold the components
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.ipadx = 10;
         gbc.ipady = 5;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Create a label and a text field
-        JLabel label = new JLabel("World Seed");
-        JTextField textField = new JTextField(20);
-
-        // Add label and text field side by side
+        JLabel wslabel = new JLabel("World Seed");
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        panel.add(label, gbc);
+        panel.add(wslabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
-        panel.add(textField, gbc);
+        panel.add(seedInput, gbc);
 
-        JButton button = getCoolStuffButton(textField, frame);
-
+        JButton button = getCoolStuffButton(frame);
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         panel.add(button, gbc);
 
-        // Add the panel to the frame
-        frame.add(panel);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(outputInfoLabel, gbc);
 
-        // Make the frame visible
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        panel.add(tpCommandLabel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        copyTpButton.addActionListener(e -> {
+            StringSelection stringSelection = new StringSelection(tpCommandLabel.getText());
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, null);
+        });
+        panel.add(copyTpButton, gbc);
+
+        frame.add(panel);
         frame.setVisible(true);
     }
 
-    private static JButton getCoolStuffButton(JTextField textField, JFrame frame) {
+    private static JButton getCoolStuffButton(JFrame frame) {
         JButton button = new JButton(TEXT_ACTIVE);
 
         button.addActionListener(e -> {
@@ -56,21 +73,28 @@ public class UserInterface {
             button.setText(TEXT_WORKING);
 
             try {
-                long seed = Long.parseLong(textField.getText());
+                long seed = Long.parseLong(seedInput.getText());
 
                 // launch finder on separate thread to avoid freezing the UI
                 Thread thread = new Thread(() -> {
                     ObbyFinder finder = new ObbyFinder(seed);
                     String cmd = finder.getFeatureTPCommand();
+                    String feedback = finder.getFeedbackMessage();
+
+                    SwingUtilities.invokeLater(() -> {
+                        tpCommandLabel.setText(cmd);
+                        outputInfoLabel.setText(feedback);
+                        button.setEnabled(true);
+                        button.setText(TEXT_ACTIVE);
+                    });
                 });
                 thread.start();
             }
             catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Please enter a valid seed", "Error", JOptionPane.ERROR_MESSAGE);
+                button.setEnabled(true);
+                button.setText(TEXT_ACTIVE);
             }
-
-            button.setEnabled(true);
-            button.setText(TEXT_ACTIVE);
         });
 
         return button;
