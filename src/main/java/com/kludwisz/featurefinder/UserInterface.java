@@ -5,8 +5,6 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 
-import static java.awt.GridBagConstraints.RELATIVE;
-
 public class UserInterface {
     private static final String TEXT_ACTIVE = "Find Cool Stuff";
     private static final String TEXT_WORKING = "Working...";
