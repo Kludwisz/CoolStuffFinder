@@ -1,6 +1,7 @@
 package com.kludwisz.featurefinder;
 
 import Xinyuiii.properties.BastionGenerator;
+import com.kludwisz.Logger;
 import com.kludwisz.populationfinder.PopulationSeedChunkFinder;
 import com.seedfinding.mcbiome.source.BiomeSource;
 import com.seedfinding.mccore.rand.ChunkRand;
@@ -107,6 +108,9 @@ public class ObbyFinder implements FeatureFinder {
                     }
                 }
             }
+        }
+        catch (Exception e) {
+            Logger.err(this, "Couldn't read seedlist file: " + e.getMessage());
         }
     }
 }

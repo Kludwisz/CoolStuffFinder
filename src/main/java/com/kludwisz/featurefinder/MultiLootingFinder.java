@@ -1,5 +1,6 @@
 package com.kludwisz.featurefinder;
 
+import com.kludwisz.Logger;
 import com.kludwisz.populationfinder.PopulationSeedChunkFinder;
 import Xinyuiii.enumType.BastionType;
 import Xinyuiii.properties.BastionGenerator;
@@ -75,7 +76,7 @@ public class MultiLootingFinder implements FeatureFinder {
             }
         }
         catch (IOException e) {
-
+            Logger.err(this, "Couldn't read seedlist file: " + e.getMessage());
         }
     }
 
