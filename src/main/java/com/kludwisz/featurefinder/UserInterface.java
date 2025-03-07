@@ -10,56 +10,61 @@ public class UserInterface {
     private static final String TEXT_WORKING = "Working...";
 
     private static final JTextField seedInput = new JTextField(20);
-    private static final JLabel outputInfoLabel = new JLabel("-");
-    private static final JLabel tpCommandLabel = new JLabel("-");
-    private static final JButton copyTpButton = new JButton("Copy TP Command");
+//    private static final JLabel outputInfoLabel = new JLabel("-");
+//    private static final JLabel tpCommandLabel = new JLabel("-");
+//    private static final JButton copyTpButton = new JButton("Copy TP Command");
+
+    private static final MultiFeatureFinder mff = new MultiFeatureFinder(
+            MultiFeatureFinder.getAllFinders(),
+            (FeatureFinder f) -> {}
+    );
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Feature Finder by Kris");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 300);
+        frame.setSize(800, 600);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.ipadx = 10;
-        gbc.ipady = 5;
-        gbc.insets = new Insets(5, 5, 5, 5);
+//        JPanel panel = new JPanel();
+//        panel.setLayout(new GridBagLayout());
+//        GridBagConstraints gbc = new GridBagConstraints();
+//        gbc.ipadx = 10;
+//        gbc.ipady = 5;
+//        gbc.insets = new Insets(5, 5, 5, 5);
+//
+//        JLabel wslabel = new JLabel("World Seed");
+//        gbc.gridx = 0;
+//        gbc.gridy = 0;
+//        gbc.anchor = GridBagConstraints.WEST;
+//        panel.add(wslabel, gbc);
+//
+//        gbc.gridx = 1;
+//        gbc.gridy = 0;
+//        panel.add(seedInput, gbc);
+//
+//        JButton button = getCoolStuffButton(frame);
+//        gbc.gridx = 0;
+//        gbc.gridy = 2;
+//        gbc.gridwidth = 2;
+//        panel.add(button, gbc);
+//
+//        gbc.gridx = 0;
+//        gbc.gridy = 3;
+//        panel.add(outputInfoLabel, gbc);
+//
+//        gbc.gridx = 0;
+//        gbc.gridy = 4;
+//        panel.add(tpCommandLabel, gbc);
+//
+//        gbc.gridx = 0;
+//        gbc.gridy = 5;
+//        copyTpButton.addActionListener(e -> {
+//            StringSelection stringSelection = new StringSelection(tpCommandLabel.getText());
+//            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+//            clipboard.setContents(stringSelection, null);
+//        });
+//        panel.add(copyTpButton, gbc);
+//        frame.add(panel);
 
-        JLabel wslabel = new JLabel("World Seed");
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(wslabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel.add(seedInput, gbc);
-
-        JButton button = getCoolStuffButton(frame);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        panel.add(button, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        panel.add(outputInfoLabel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        panel.add(tpCommandLabel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        copyTpButton.addActionListener(e -> {
-            StringSelection stringSelection = new StringSelection(tpCommandLabel.getText());
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(stringSelection, null);
-        });
-        panel.add(copyTpButton, gbc);
-
-        frame.add(panel);
         frame.setVisible(true);
     }
 
@@ -75,14 +80,10 @@ public class UserInterface {
 
                 // launch finder on separate thread to avoid freezing the UI
                 Thread thread = new Thread(() -> {
-                    ObbyFinder finder = new ObbyFinder();
-                    finder.setWorldSeed(seed);
-                    String cmd = finder.getFeatureTPCommand();
-                    String feedback = finder.getFeedbackMessage();
+                    mff.setWorldSeed(seed);
 
                     SwingUtilities.invokeLater(() -> {
-                        tpCommandLabel.setText(cmd);
-                        outputInfoLabel.setText(feedback);
+                        mff.run();
                         button.setEnabled(true);
                         button.setText(TEXT_ACTIVE);
                     });
@@ -97,6 +98,53 @@ public class UserInterface {
         });
 
         return button;
+    }
+
+    private static JPanel createFinderArray() {
+        JPanel result = new JPanel();
+        result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
+
+        int index = 0;
+        for (FeatureFinder finder : mff.getFinders()) {
+            JPanel arrayRow = new JPanel();
+            arrayRow.setLayout(new BoxLayout(arrayRow, BoxLayout.X_AXIS));
+
+            // enable/disable checkbox
+            JCheckBox checkBox = new JCheckBox(finder.name());
+            checkBox.setSelected(true);
+            final int finalIndex = index;
+            checkBox.addActionListener(e -> {
+                if (checkBox.isSelected()) {
+                    mff.enableFinder(finalIndex);
+                } else {
+                    mff.disableFinder(finalIndex);
+                }
+            });
+            arrayRow.add(checkBox);
+
+            // finder name as label
+            JLabel label = new JLabel(finder.name());
+            arrayRow.add(label);
+
+            // label displaying feedback message
+            JLabel feedbackLabel = new JLabel("-");
+            arrayRow.add(feedbackLabel);
+
+            // label displaying TP command
+            JLabel tpLabel = new JLabel("-");
+            arrayRow.add(tpLabel);
+
+            // button for tp-ing tp command
+            JButton tpButton = new JButton("Copy TP Command");
+            tpButton.addActionListener(e -> {
+                StringSelection stringSelection = new StringSelection(tpLabel.getText());
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+            });
+
+
+            index++;
+        }
     }
 }
 

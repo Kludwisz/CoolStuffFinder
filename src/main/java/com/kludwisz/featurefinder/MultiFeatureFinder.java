@@ -23,15 +23,12 @@ public class MultiFeatureFinder implements FeatureFinder {
 
     // ------------------------------------------------------------------------------------------------------------
 
-    public static MultiFeatureFinder createDefault() {
-        return new MultiFeatureFinder(
-                List.of(
-                        new ObbyFinder(),
-                        new RPFinder(),
-                        new RPFinder().lootingSwords(),
-                        new MultiLootingFinder()
-                ),
-                finder -> {}
+    public static List<FeatureFinder> getAllFinders() {
+        return List.of(
+                new ObbyFinder(),
+                new RPFinder(),
+                new RPFinder().lootingSwords(),
+                new MultiLootingFinder()
         );
     }
 
