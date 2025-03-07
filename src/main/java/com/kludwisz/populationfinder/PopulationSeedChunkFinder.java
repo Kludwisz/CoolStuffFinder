@@ -1,5 +1,6 @@
 package com.kludwisz.populationfinder;
 
+import com.seedfinding.mccore.rand.ChunkRand;
 import com.seedfinding.mccore.util.pos.CPos;
 import com.seedfinding.mcmath.util.Mth;
 import com.seedfinding.mcseed.rand.JRand;
@@ -119,9 +120,5 @@ public class PopulationSeedChunkFinder {
 
         System.out.println("Execution time: " + (end - start) / 1_000_000.0D + " ms");
         System.out.println("Found " + positions.size() + " chunks");
-    }
-
-    public static void main(String[] args) {
-        timeTest();
     }
 }

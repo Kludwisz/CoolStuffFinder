@@ -23,17 +23,32 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
-public class ObbyFinder {
+public class ObbyFinder implements FeatureFinder {
     private final InputStream SEEDLIST_INPUT_STREAM = Objects.requireNonNull(ObbyFinder.class.getClassLoader().getResourceAsStream("bastionObby.txt"));
 
-    private final long worldseed;
+    private long worldseed;
+    private String tpCommand;
     private int obbyCount = 0;
 
-    public ObbyFinder(long worldseed) {
+    @Override
+    public void setWorldSeed(long worldseed) {
         this.worldseed = worldseed;
     }
 
+    @Override
     public String getFeatureTPCommand() {
+        return this.tpCommand;
+    }
+
+    @Override
+    public String getFeedbackMessage() {
+        return "Found double chest with " + obbyCount  + " obsidian.";
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void run() {
         // load seedlist into memory
         try (Scanner fin = new Scanner(SEEDLIST_INPUT_STREAM)) {
             ArrayList<Long> popseeds = new ArrayList<>();
@@ -84,8 +99,8 @@ public class ObbyFinder {
                                 if (obbyTotal >= 46) {
                                     if (!bastion.canSpawn(pos, nbs)) continue;
 
-                                    obbyCount = obbyTotal;
-                                    return "/execute in minecraft:the_nether run tp @s " + pair1.getFirst().getX() + " " + pair1.getFirst().getY() + " " + pair1.getFirst().getZ() + " ";
+                                    this.obbyCount = obbyTotal;
+                                    this.tpCommand = "/execute in minecraft:the_nether run tp @s " + pair1.getFirst().getX() + " " + pair1.getFirst().getY() + " " + pair1.getFirst().getZ() + " ";
                                 }
                             }
                         }
@@ -93,11 +108,5 @@ public class ObbyFinder {
                 }
             }
         }
-
-        return null;
-    }
-
-    public String getFeedbackMessage() {
-        return "Found double chest with " + obbyCount  + " obsidian.";
     }
 }

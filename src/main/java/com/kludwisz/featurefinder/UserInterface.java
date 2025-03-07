@@ -75,7 +75,8 @@ public class UserInterface {
 
                 // launch finder on separate thread to avoid freezing the UI
                 Thread thread = new Thread(() -> {
-                    ObbyFinder finder = new ObbyFinder(seed);
+                    ObbyFinder finder = new ObbyFinder();
+                    finder.setWorldSeed(seed);
                     String cmd = finder.getFeatureTPCommand();
                     String feedback = finder.getFeedbackMessage();
 
