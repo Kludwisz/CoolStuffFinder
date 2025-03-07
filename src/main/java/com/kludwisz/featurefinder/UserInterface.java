@@ -1,5 +1,7 @@
 package com.kludwisz.featurefinder;
 
+import com.kludwisz.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -10,9 +12,6 @@ public class UserInterface {
     private static final String TEXT_WORKING = "Working...";
 
     private static final JTextField seedInput = new JTextField(20);
-//    private static final JLabel outputInfoLabel = new JLabel("-");
-//    private static final JLabel tpCommandLabel = new JLabel("-");
-//    private static final JButton copyTpButton = new JButton("Copy TP Command");
 
     private static final MultiFeatureFinder mff = new MultiFeatureFinder(
             MultiFeatureFinder.getAllFinders(),
@@ -65,6 +64,18 @@ public class UserInterface {
 //        panel.add(copyTpButton, gbc);
 //        frame.add(panel);
 
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // seed input field & label
+        // TODO
+
+        // button to start searching
+        // TODO
+
+        JPanel finderArray = createFinderArray();
+        frame.add(finderArray);
+
         frame.setVisible(true);
     }
 
@@ -106,8 +117,11 @@ public class UserInterface {
 
         int index = 0;
         for (FeatureFinder finder : mff.getFinders()) {
+            Logger.log("Adding finder: " + finder.getClass().getSimpleName());
+
             JPanel arrayRow = new JPanel();
-            arrayRow.setLayout(new BoxLayout(arrayRow, BoxLayout.X_AXIS));
+            arrayRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+            arrayRow.setLayout(new GridLayout(1, 4, 50, 0));
 
             // enable/disable checkbox
             JCheckBox checkBox = new JCheckBox(finder.name());
@@ -122,10 +136,6 @@ public class UserInterface {
             });
             arrayRow.add(checkBox);
 
-            // finder name as label
-            JLabel label = new JLabel(finder.name());
-            arrayRow.add(label);
-
             // label displaying feedback message
             JLabel feedbackLabel = new JLabel("-");
             arrayRow.add(feedbackLabel);
@@ -136,15 +146,25 @@ public class UserInterface {
 
             // button for tp-ing tp command
             JButton tpButton = new JButton("Copy TP Command");
+            // make the button constant-size
+            tpButton.setPreferredSize(new Dimension(50, 30));
+
             tpButton.addActionListener(e -> {
                 StringSelection stringSelection = new StringSelection(tpLabel.getText());
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(stringSelection, null);
             });
-
-
+            arrayRow.add(tpButton);
             index++;
+
+            result.add(arrayRow);
+            result.add(Box.createRigidArea(new Dimension(0, 10)));
         }
+
+        // squish everything to the top
+        result.add(Box.createRigidArea(new Dimension(0, 4096)));
+
+        return result;
     }
 }
 
