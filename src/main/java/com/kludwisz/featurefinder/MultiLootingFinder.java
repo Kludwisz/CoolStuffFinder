@@ -1,6 +1,5 @@
 package com.kludwisz.featurefinder;
 
-import com.kludwisz.Logger;
 import com.kludwisz.populationfinder.PopulationSeedChunkFinder;
 import Xinyuiii.enumType.BastionType;
 import Xinyuiii.properties.BastionGenerator;

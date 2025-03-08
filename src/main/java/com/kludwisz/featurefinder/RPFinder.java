@@ -1,6 +1,5 @@
 package com.kludwisz.featurefinder;
 
-import com.kludwisz.Logger;
 import com.kludwisz.populationfinder.PopulationSeedChunkFinder;
 import com.seedfinding.mcbiome.source.BiomeSource;
 import com.seedfinding.mccore.rand.ChunkRand;
