@@ -17,16 +17,13 @@ import com.seedfinding.mcfeature.loot.item.ItemStack;
 import com.seedfinding.mcfeature.structure.BastionRemnant;
 import com.seedfinding.mcseed.lcg.LCG;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class MultiLootingFinder implements FeatureFinder {
-    private static final String SEEDLIST_FILENAME = Paths.get("src/main/resources/seedlists/multiLootingTreasure.txt").toAbsolutePath().toString();
-
     private long worldseed;
     private String tpCommand;
 
@@ -40,17 +37,28 @@ public class MultiLootingFinder implements FeatureFinder {
         return tpCommand;
     }
 
+    @Override
+    public String getFeedbackMessage() {
+        return tpCommand == null ? "not found." : "10+ looting levels total";
+    }
+
+    @Override
+    public String name() {
+        return "Looting Treasure Finder";
+    }
+
+
     // ------------------------------------------------------------------------------------------------------------
 
     @Override
     public void run() {
         tpCommand = null;
 
-        try {
+        InputStream SEEDLIST_INPUT_STREAM = Objects.requireNonNull(ObbyFinder.class.getClassLoader().getResourceAsStream("bastionObby.txt"));
+        try (Scanner fin = new Scanner(SEEDLIST_INPUT_STREAM)) {
             ArrayList<Long> popseeds = new ArrayList<>();
-
             ChunkRand rand = new ChunkRand();
-            Scanner fin = new Scanner(new File(SEEDLIST_FILENAME));
+
             while (fin.hasNextLong()) {
                 long internalSeed = fin.nextLong();
                 rand.setSeed(internalSeed, false);
@@ -74,9 +82,6 @@ public class MultiLootingFinder implements FeatureFinder {
                 tpCommand = cmd;
                 return;
             }
-        }
-        catch (IOException e) {
-            Logger.err(this, "Couldn't read seedlist file: " + e.getMessage());
         }
     }
 

@@ -13,18 +13,14 @@ import com.seedfinding.mcfeature.structure.RuinedPortal;
 import com.seedfinding.mcfeature.structure.generator.structure.RuinedPortalGenerator;
 import com.seedfinding.mcterrain.TerrainGenerator;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class RPFinder implements FeatureFinder {
-    private static final String SEEDLIST_FILENAME = Paths.get("src/main/resources/seedlists/notchRP.txt").toAbsolutePath().toString();
-    private static final String ALT_SEEDLIST_FILENAME = Paths.get("src/main/resources/seedlists/multiLootingRP.txt").toAbsolutePath().toString();
-
-    private String seedlistFilename;
+    private String resource;
     private String type;
     private long worldseed;
     private String tpCommand;
@@ -40,6 +36,13 @@ public class RPFinder implements FeatureFinder {
     }
 
     @Override
+    public String getFeedbackMessage() {
+        if (tpCommand == null)
+            return "not found.";
+        return type.equals(" (notches)") ? "4+ notches" : "4+ looting III swords";
+    }
+
+    @Override
     public String name() {
         return "RPFinder" + type;
     }
@@ -47,12 +50,12 @@ public class RPFinder implements FeatureFinder {
     // ------------------------------------------------------------------------------------------------------------
 
     public RPFinder() {
-        this.seedlistFilename = SEEDLIST_FILENAME;
+        this.resource = "notchRP.txt";
         this.type = " (notches)";
     }
 
     public RPFinder lootingSwords() {
-        this.seedlistFilename = ALT_SEEDLIST_FILENAME;
+        this.resource = "multiLootingRP.txt";
         this.type = " (looting)";
         return this;
     }
@@ -63,11 +66,10 @@ public class RPFinder implements FeatureFinder {
     public void run() {
         tpCommand = null;
 
-        // load seedlist into memory
-        try {
+        InputStream SEEDLIST_INPUT_STREAM = Objects.requireNonNull(ObbyFinder.class.getClassLoader().getResourceAsStream(resource));
+        try (Scanner fin = new Scanner(SEEDLIST_INPUT_STREAM)) {
             ArrayList<Long> popseeds = new ArrayList<>();
 
-            Scanner fin = new Scanner(new File(seedlistFilename));
             while (fin.hasNextLong()) {
                 long popseed = fin.nextLong();
                 fin.nextInt();
@@ -91,9 +93,6 @@ public class RPFinder implements FeatureFinder {
                 }
             }
         }
-        catch (IOException e) {
-            Logger.err(this, "Couldn't read seedlist file: " + e.getMessage());
-        }
     }
 
     private BPos processGoodPortal(CPos chunkPos) {
@@ -101,6 +100,9 @@ public class RPFinder implements FeatureFinder {
         TerrainGenerator ntg = TerrainGenerator.of(nbs);
         RuinedPortalGenerator rpgen = new RuinedPortalGenerator(MCVersion.v1_16_1);
         rpgen.generate(ntg, chunkPos);
+        if (rpgen.getChestsPos().isEmpty())
+            return null;
+
         return rpgen.getChestsPos().get(0).getSecond();
     }
 }

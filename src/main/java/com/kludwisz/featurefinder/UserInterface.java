@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.ArrayList;
 
 public class UserInterface {
     private static final String TEXT_ACTIVE = "Find Cool Stuff";
@@ -13,69 +14,52 @@ public class UserInterface {
 
     private static final JTextField seedInput = new JTextField(20);
 
+    private static final ArrayList<JLabel> tpRefs = new ArrayList<>();
+    private static final ArrayList<JLabel> feedbackRefs = new ArrayList<>();
     private static final MultiFeatureFinder mff = new MultiFeatureFinder(
             MultiFeatureFinder.getAllFinders(),
-            (FeatureFinder f) -> {}
+            UserInterface::updateFuntion
     );
+
+    private static void updateFuntion(FeatureFinder f) {
+        int index = mff.getFinders().indexOf(f);
+        if (index == -1)
+            return; // finder is not on the visiblee list, ignore
+
+        Logger.log("Updating UI for finder " + f.name() + " " + f.getFeedbackMessage() + " " + f.getFeatureTPCommand());
+        JLabel feedbackLabel = feedbackRefs.get(index);
+        JLabel tpLabel = tpRefs.get(index);
+
+        feedbackLabel.setText(f.getFeedbackMessage());
+        tpLabel.setText(f.getFeatureTPCommand());
+    }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Feature Finder by Kris");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
-//        JPanel panel = new JPanel();
-//        panel.setLayout(new GridBagLayout());
-//        GridBagConstraints gbc = new GridBagConstraints();
-//        gbc.ipadx = 10;
-//        gbc.ipady = 5;
-//        gbc.insets = new Insets(5, 5, 5, 5);
-//
-//        JLabel wslabel = new JLabel("World Seed");
-//        gbc.gridx = 0;
-//        gbc.gridy = 0;
-//        gbc.anchor = GridBagConstraints.WEST;
-//        panel.add(wslabel, gbc);
-//
-//        gbc.gridx = 1;
-//        gbc.gridy = 0;
-//        panel.add(seedInput, gbc);
-//
-//        JButton button = getCoolStuffButton(frame);
-//        gbc.gridx = 0;
-//        gbc.gridy = 2;
-//        gbc.gridwidth = 2;
-//        panel.add(button, gbc);
-//
-//        gbc.gridx = 0;
-//        gbc.gridy = 3;
-//        panel.add(outputInfoLabel, gbc);
-//
-//        gbc.gridx = 0;
-//        gbc.gridy = 4;
-//        panel.add(tpCommandLabel, gbc);
-//
-//        gbc.gridx = 0;
-//        gbc.gridy = 5;
-//        copyTpButton.addActionListener(e -> {
-//            StringSelection stringSelection = new StringSelection(tpCommandLabel.getText());
-//            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-//            clipboard.setContents(stringSelection, null);
-//        });
-//        panel.add(copyTpButton, gbc);
-//        frame.add(panel);
-
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.X_AXIS));
+
         // seed input field & label
-        // TODO
+        JLabel seedLabel = new JLabel("   World Seed:   ");
+        inputPanel.add(seedLabel);
+        inputPanel.add(seedInput);
 
         // button to start searching
-        // TODO
+        JButton searchButton = getCoolStuffButton(frame);
+        inputPanel.add(searchButton);
 
         JPanel finderArray = createFinderArray();
-        frame.add(finderArray);
 
+        mainPanel.add(inputPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(finderArray);
+        frame.add(mainPanel);
         frame.setVisible(true);
     }
 
@@ -117,11 +101,11 @@ public class UserInterface {
 
         int index = 0;
         for (FeatureFinder finder : mff.getFinders()) {
-            Logger.log("Adding finder: " + finder.getClass().getSimpleName());
+            //Logger.log("Adding finder: " + finder.getClass().getSimpleName());
 
             JPanel arrayRow = new JPanel();
             arrayRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-            arrayRow.setLayout(new GridLayout(1, 4, 50, 0));
+            arrayRow.setLayout(new GridLayout(1, 4, 0, 0));
 
             // enable/disable checkbox
             JCheckBox checkBox = new JCheckBox(finder.name());
@@ -129,8 +113,10 @@ public class UserInterface {
             final int finalIndex = index;
             checkBox.addActionListener(e -> {
                 if (checkBox.isSelected()) {
+                    Logger.log("Enabling finder " + finalIndex + " -> " + mff.getFinders().get(finalIndex).name());
                     mff.enableFinder(finalIndex);
                 } else {
+                    Logger.log("Disabling finder " + finalIndex + " -> " + mff.getFinders().get(finalIndex).name());
                     mff.disableFinder(finalIndex);
                 }
             });
@@ -139,15 +125,15 @@ public class UserInterface {
             // label displaying feedback message
             JLabel feedbackLabel = new JLabel("-");
             arrayRow.add(feedbackLabel);
+            feedbackRefs.add(feedbackLabel);
 
             // label displaying TP command
             JLabel tpLabel = new JLabel("-");
             arrayRow.add(tpLabel);
+            tpRefs.add(tpLabel);
 
             // button for tp-ing tp command
             JButton tpButton = new JButton("Copy TP Command");
-            // make the button constant-size
-            tpButton.setPreferredSize(new Dimension(50, 30));
 
             tpButton.addActionListener(e -> {
                 StringSelection stringSelection = new StringSelection(tpLabel.getText());
@@ -158,11 +144,11 @@ public class UserInterface {
             index++;
 
             result.add(arrayRow);
-            result.add(Box.createRigidArea(new Dimension(0, 10)));
+            result.add(Box.createRigidArea(new Dimension(10, 10)));
         }
 
         // squish everything to the top
-        result.add(Box.createRigidArea(new Dimension(0, 4096)));
+        result.add(Box.createRigidArea(new Dimension(0, 2048)));
 
         return result;
     }

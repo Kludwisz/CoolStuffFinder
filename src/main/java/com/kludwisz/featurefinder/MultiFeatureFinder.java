@@ -9,11 +9,11 @@ public class MultiFeatureFinder implements FeatureFinder {
     private final ArrayList<Boolean> enabledFinders;
     private final Consumer<FeatureFinder> updateFunction;
 
+    private long worldseed;
+
     @Override
     public void setWorldSeed(long worldseed) {
-        for (FeatureFinder finder : finders) {
-            finder.setWorldSeed(worldseed);
-        }
+        this.worldseed = worldseed;
     }
 
     @Override
@@ -59,10 +59,11 @@ public class MultiFeatureFinder implements FeatureFinder {
     public void run() {
         for (int i = 0; i < finders.size(); i++) {
             if (enabledFinders.get(i)) {
+                finders.get(i).setWorldSeed(worldseed);
                 finders.get(i).run();
                 updateFunction.accept(finders.get(i));
             }
         }
-        updateFunction.accept(this);
+        //updateFunction.accept(this);
     }
 }

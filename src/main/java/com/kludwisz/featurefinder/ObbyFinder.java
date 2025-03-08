@@ -18,15 +18,12 @@ import com.seedfinding.mcfeature.structure.BastionRemnant;
 import com.seedfinding.mcseed.lcg.LCG;
 
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class ObbyFinder implements FeatureFinder {
-    private final InputStream SEEDLIST_INPUT_STREAM = Objects.requireNonNull(ObbyFinder.class.getClassLoader().getResourceAsStream("bastionObby.txt"));
-
     private long worldseed;
     private String tpCommand;
     private int obbyCount = 0;
@@ -43,14 +40,24 @@ public class ObbyFinder implements FeatureFinder {
 
     @Override
     public String getFeedbackMessage() {
-        return "Found double chest with " + obbyCount  + " obsidian.";
+        if (tpCommand == null)
+            return "not found.";
+        return obbyCount  + " obsidian";
+    }
+
+    @Override
+    public String name() {
+        return "Obby Finder";
     }
 
     // ------------------------------------------------------------------------------------------------------------
 
     @Override
     public void run() {
+        tpCommand = null;
+
         // load seedlist into memory
+        InputStream SEEDLIST_INPUT_STREAM = Objects.requireNonNull(ObbyFinder.class.getClassLoader().getResourceAsStream("bastionObby.txt"));
         try (Scanner fin = new Scanner(SEEDLIST_INPUT_STREAM)) {
             ArrayList<Long> popseeds = new ArrayList<>();
             ChunkRand rand = new ChunkRand();
@@ -100,17 +107,16 @@ public class ObbyFinder implements FeatureFinder {
                                 if (obbyTotal >= 46) {
                                     if (!bastion.canSpawn(pos, nbs)) continue;
 
+                                    Logger.log("Found bastion with " + obbyTotal + " obsidian at " + pos + " in region " + region);
                                     this.obbyCount = obbyTotal;
                                     this.tpCommand = "/execute in minecraft:the_nether run tp @s " + pair1.getFirst().getX() + " " + pair1.getFirst().getY() + " " + pair1.getFirst().getZ() + " ";
+                                    return;
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        catch (Exception e) {
-            Logger.err(this, "Couldn't read seedlist file: " + e.getMessage());
         }
     }
 }
