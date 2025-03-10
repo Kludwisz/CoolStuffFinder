@@ -19,7 +19,7 @@ public class UserInterface {
     private static final ArrayList<JLabel> feedbackRefs = new ArrayList<>();
     private static final MultiFeatureFinder mff = new MultiFeatureFinder(
             MultiFeatureFinder.getAllFinders(),
-            UserInterface::updateFuntion
+            ff -> SwingUtilities.invokeLater(() -> UserInterface.updateFuntion(ff))
     );
 
     private static void updateFuntion(FeatureFinder f) {
@@ -77,9 +77,9 @@ public class UserInterface {
                 // launch finder on separate thread to avoid freezing the UI
                 Thread thread = new Thread(() -> {
                     mff.setWorldSeed(seed);
+                    mff.run();
 
                     SwingUtilities.invokeLater(() -> {
-                        mff.run();
                         button.setEnabled(true);
                         button.setText(TEXT_ACTIVE);
                     });
