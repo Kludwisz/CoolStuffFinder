@@ -71,6 +71,12 @@ public class UserInterface {
             button.setEnabled(false);
             button.setText(TEXT_WORKING);
 
+            // reset the ui
+            for (JLabel feedbackLabel : feedbackRefs)
+                feedbackLabel.setText("-");
+            for (JLabel tpLabel : tpRefs)
+                tpLabel.setText("-");
+
             try {
                 long seed = Long.parseLong(seedInput.getText());
 
@@ -87,7 +93,7 @@ public class UserInterface {
                 thread.start();
             }
             catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Please enter a valid seed", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Please enter a valid seed (text seeds are not supported)", "Error", JOptionPane.ERROR_MESSAGE);
                 button.setEnabled(true);
                 button.setText(TEXT_ACTIVE);
             }
@@ -139,6 +145,8 @@ public class UserInterface {
             JButton tpButton = new JButton("Copy TP Command");
 
             tpButton.addActionListener(e -> {
+                if (tpLabel.getText().equals("-"))
+                    return;
                 StringSelection stringSelection = new StringSelection(tpLabel.getText());
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(stringSelection, null);
