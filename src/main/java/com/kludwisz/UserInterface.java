@@ -1,6 +1,7 @@
-package com.kludwisz.featurefinder;
+package com.kludwisz;
 
-import com.kludwisz.Logger;
+import com.kludwisz.featurefinder.FeatureFinder;
+import com.kludwisz.featurefinder.MultiFeatureFinder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -115,9 +116,11 @@ public class UserInterface {
                 if (checkBox.isSelected()) {
                     Logger.log("Enabling finder " + finalIndex + " -> " + mff.getFinders().get(finalIndex).name());
                     mff.enableFinder(finalIndex);
+                    checkBox.setFont(new Font(checkBox.getFont().getName(), Font.BOLD, checkBox.getFont().getSize()));
                 } else {
                     Logger.log("Disabling finder " + finalIndex + " -> " + mff.getFinders().get(finalIndex).name());
                     mff.disableFinder(finalIndex);
+                    checkBox.setFont(new Font(checkBox.getFont().getName(), Font.ITALIC, checkBox.getFont().getSize()));
                 }
             });
             arrayRow.add(checkBox);
